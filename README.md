@@ -11,11 +11,16 @@ This project is a practical hackathon prototype for industrial diagnostics using
 
 The ESP32 is intentionally **not** the PLC. It behaves like a machine-side edge diagnostics accessory that subscribes to live state and displays useful fault guidance near the machine.
 
+## Start Here
+
+For the single-page navigation guide, open [START_HERE.md](/Users/suraa/Desktop/1/START_HERE.md).
+
 ## File Tree
 
 ```text
 industrial-ai-diagnostics/
 ├── README.md
+├── START_HERE.md
 ├── .env.example
 ├── requirements.txt
 ├── bridge.py
