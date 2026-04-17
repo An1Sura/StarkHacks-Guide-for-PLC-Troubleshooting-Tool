@@ -14,6 +14,7 @@ The ESP32 is intentionally **not** the PLC. It behaves like a machine-side edge 
 ## Start Here
 
 For the single-page navigation guide, open [START_HERE.md](/Users/suraa/Desktop/1/START_HERE.md).
+For the most detailed long-form instructions, open [full_build_manual.md](/Users/suraa/Desktop/1/full_build_manual.md).
 
 ## File Tree
 
@@ -28,7 +29,16 @@ industrial-ai-diagnostics/
 ├── dashboard.py
 ├── main.cpp
 ├── plc_logic.st
+├── codesys_constants.st
+├── codesys_globals.st
+├── codesys_fb_conveyor_demo.st
+├── codesys_fb_tank_fill_demo.st
+├── codesys_fb_hvac_demo.st
+├── codesys_demo_supervisor.st
+├── codesys_main_program.st
+├── codesys_import_guide.md
 ├── project_execution_guide.md
+├── full_build_manual.md
 ├── factoryio_tag_plan.md
 ├── commissioning_checklist.md
 ├── demo_runbook.md

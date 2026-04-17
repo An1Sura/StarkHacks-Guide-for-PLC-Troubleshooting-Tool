@@ -52,6 +52,7 @@ Use it to install:
 Open:
 
 - [project_execution_guide.md](/Users/suraa/Desktop/1/project_execution_guide.md)
+- [full_build_manual.md](/Users/suraa/Desktop/1/full_build_manual.md)
 
 This is the main step-by-step build manual.
 
@@ -59,6 +60,14 @@ This is the main step-by-step build manual.
 
 Open:
 
+- [codesys_import_guide.md](/Users/suraa/Desktop/1/codesys_import_guide.md)
+- [codesys_main_program.st](/Users/suraa/Desktop/1/codesys_main_program.st)
+- [codesys_globals.st](/Users/suraa/Desktop/1/codesys_globals.st)
+- [codesys_fb_conveyor_demo.st](/Users/suraa/Desktop/1/codesys_fb_conveyor_demo.st)
+- [codesys_fb_tank_fill_demo.st](/Users/suraa/Desktop/1/codesys_fb_tank_fill_demo.st)
+- [codesys_fb_hvac_demo.st](/Users/suraa/Desktop/1/codesys_fb_hvac_demo.st)
+- [codesys_demo_supervisor.st](/Users/suraa/Desktop/1/codesys_demo_supervisor.st)
+- [codesys_constants.st](/Users/suraa/Desktop/1/codesys_constants.st)
 - [plc_logic.st](/Users/suraa/Desktop/1/plc_logic.st)
 - [register_map.md](/Users/suraa/Desktop/1/register_map.md)
 
