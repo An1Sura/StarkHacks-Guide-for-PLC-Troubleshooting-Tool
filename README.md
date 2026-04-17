@@ -15,6 +15,7 @@ The ESP32 is intentionally **not** the PLC. It behaves like a machine-side edge 
 
 For the single-page navigation guide, open [START_HERE.md](/Users/suraa/Desktop/1/START_HERE.md).
 For the most detailed long-form instructions, open [full_build_manual.md](/Users/suraa/Desktop/1/full_build_manual.md).
+For the fundamentals and plain-English system explanation, open [how_it_works.md](/Users/suraa/Desktop/1/how_it_works.md).
 
 ## File Tree
 
@@ -22,6 +23,7 @@ For the most detailed long-form instructions, open [full_build_manual.md](/Users
 industrial-ai-diagnostics/
 ├── README.md
 ├── START_HERE.md
+├── how_it_works.md
 ├── .env.example
 ├── requirements.txt
 ├── bridge.py

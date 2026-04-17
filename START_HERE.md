@@ -32,6 +32,18 @@ Follow this exact order:
 
 ## 3. Open These Files In This Order
 
+### Step 0. Understand the project first
+
+Open:
+
+- [how_it_works.md](/Users/suraa/Desktop/1/how_it_works.md)
+
+Use it when you want the plain-English explanation of:
+
+- what the project does
+- why each part exists
+- how the architecture works fundamentally
+
 ### Step 1. Tool installs
 
 Open:
