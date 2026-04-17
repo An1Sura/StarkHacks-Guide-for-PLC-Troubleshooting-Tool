@@ -1,20 +1,14 @@
 # Start Here
 
-This is the single page to follow when building the project.
+Open [ULTIMATE_GUIDE.md](/Users/suraa/Desktop/1/ULTIMATE_GUIDE.md).
 
-If you only open one file first, make it this one.
+That is now the main document for this project.
 
-## 1. What This Project Is
+If you only open one file first, make it `ULTIMATE_GUIDE.md`.
 
-You are building an industrial AI diagnostics prototype with:
+## 1. What This Page Is
 
-- `CODESYS` as the PLC logic layer
-- `Factory I/O` as the machine simulation
-- `Python` as the Modbus + AI + API bridge
-- `Streamlit` as the dashboard
-- `ESP32` as the external diagnostics node
-
-The ESP32 is not the PLC. The AI is not the control loop.
+This page is now just a fast redirect page so you do not get buried in too many docs.
 
 ## 2. Build Order
 
@@ -30,150 +24,9 @@ Follow this exact order:
 8. Flash and test the ESP32
 9. Rehearse the demo scenarios
 
-## 3. Open These Files In This Order
+## 3. What To Open
 
-### Step 0. Understand the project first
-
-Open:
-
-- [how_it_works.md](/Users/suraa/Desktop/1/how_it_works.md)
-
-Use it when you want the plain-English explanation of:
-
-- what the project does
-- why each part exists
-- how the architecture works fundamentally
-
-### Step 1. Tool installs
-
-Open:
-
-- [downloads_and_tools.md](/Users/suraa/Desktop/1/downloads_and_tools.md)
-
-Use it to install:
-
-- CODESYS
-- Factory I/O
-- Python
-- Arduino IDE
-- ESP32 support
-- Arduino libraries
-
-### Step 2. Full build guide
-
-Open:
-
-- [project_execution_guide.md](/Users/suraa/Desktop/1/project_execution_guide.md)
-- [full_build_manual.md](/Users/suraa/Desktop/1/full_build_manual.md)
-
-This is the main step-by-step build manual.
-
-### Step 3. PLC and register plan
-
-Open:
-
-- [codesys_import_guide.md](/Users/suraa/Desktop/1/codesys_import_guide.md)
-- [codesys_main_program.st](/Users/suraa/Desktop/1/codesys_main_program.st)
-- [codesys_globals.st](/Users/suraa/Desktop/1/codesys_globals.st)
-- [codesys_fb_conveyor_demo.st](/Users/suraa/Desktop/1/codesys_fb_conveyor_demo.st)
-- [codesys_fb_tank_fill_demo.st](/Users/suraa/Desktop/1/codesys_fb_tank_fill_demo.st)
-- [codesys_fb_hvac_demo.st](/Users/suraa/Desktop/1/codesys_fb_hvac_demo.st)
-- [codesys_demo_supervisor.st](/Users/suraa/Desktop/1/codesys_demo_supervisor.st)
-- [codesys_constants.st](/Users/suraa/Desktop/1/codesys_constants.st)
-- [plc_logic.st](/Users/suraa/Desktop/1/plc_logic.st)
-- [register_map.md](/Users/suraa/Desktop/1/register_map.md)
-
-Use these to:
-
-- build the PLC logic in CODESYS
-- map the holding registers correctly
-
-### Step 4. Factory I/O mapping
-
-Open:
-
-- [factoryio_tag_plan.md](/Users/suraa/Desktop/1/factoryio_tag_plan.md)
-
-Use it to decide:
-
-- what scene to build first
-- what tags to map first
-- what not to overbuild too early
-
-### Step 5. Prove PLC -> Python
-
-Open:
-
-- [modbus_smoke_test.py](/Users/suraa/Desktop/1/modbus_smoke_test.py)
-
-Run it before the full backend.
-
-This tells you whether Modbus is working.
-
-### Step 6. Backend
-
-Open:
-
-- [bridge.py](/Users/suraa/Desktop/1/bridge.py)
-- [.env.example](/Users/suraa/Desktop/1/.env.example)
-
-Use these to:
-
-- set IPs, ports, and API key
-- run the FastAPI bridge
-- poll Modbus
-- trigger diagnostics
-
-### Step 7. Dashboard
-
-Open:
-
-- [dashboard.py](/Users/suraa/Desktop/1/dashboard.py)
-
-Use it to verify:
-
-- tags
-- events
-- active issue
-- AI explanations
-
-### Step 8. ESP32 hardware node
-
-Open:
-
-- [esp32_wiring.md](/Users/suraa/Desktop/1/esp32_wiring.md)
-- [main.cpp](/Users/suraa/Desktop/1/main.cpp)
-
-Use these to:
-
-- wire the OLED, LED, and buttons
-- set Wi-Fi credentials
-- point the ESP32 at the Python bridge
-
-### Step 9. AI prompt behavior
-
-Open:
-
-- [prompts.md](/Users/suraa/Desktop/1/prompts.md)
-
-Optional supporting files:
-
-- [ai_tools_comparison.md](/Users/suraa/Desktop/1/ai_tools_comparison.md)
-- [ai_prompts_by_tool.md](/Users/suraa/Desktop/1/ai_prompts_by_tool.md)
-
-### Step 10. Demo prep
-
-Open:
-
-- [demo_cases.md](/Users/suraa/Desktop/1/demo_cases.md)
-- [demo_runbook.md](/Users/suraa/Desktop/1/demo_runbook.md)
-- [commissioning_checklist.md](/Users/suraa/Desktop/1/commissioning_checklist.md)
-
-Use these to:
-
-- choose the strongest scenarios
-- rehearse the live demo
-- make sure nothing is missing
+Open [ULTIMATE_GUIDE.md](/Users/suraa/Desktop/1/ULTIMATE_GUIDE.md), then follow only the files it tells you to open.
 
 ## 4. Recommended Minimum Demo
 
@@ -198,16 +51,10 @@ If you want the fastest route to success:
 
 ## 6. If Something Breaks
 
-Go back one layer:
-
-- Factory I/O issue -> check [factoryio_tag_plan.md](/Users/suraa/Desktop/1/factoryio_tag_plan.md)
-- Modbus issue -> run [modbus_smoke_test.py](/Users/suraa/Desktop/1/modbus_smoke_test.py)
-- backend issue -> check [bridge.py](/Users/suraa/Desktop/1/bridge.py)
-- ESP32 issue -> check [esp32_wiring.md](/Users/suraa/Desktop/1/esp32_wiring.md) and [main.cpp](/Users/suraa/Desktop/1/main.cpp)
-- demo issue -> check [commissioning_checklist.md](/Users/suraa/Desktop/1/commissioning_checklist.md)
+Go back to [ULTIMATE_GUIDE.md](/Users/suraa/Desktop/1/ULTIMATE_GUIDE.md). It now contains the main decision tree.
 
 ## 7. One-Line Summary
 
 If you want the shortest answer:
 
-Start with [project_execution_guide.md](/Users/suraa/Desktop/1/project_execution_guide.md), and use this page as your navigation hub for everything else.
+Start with [ULTIMATE_GUIDE.md](/Users/suraa/Desktop/1/ULTIMATE_GUIDE.md), and use this page only as a redirect.
