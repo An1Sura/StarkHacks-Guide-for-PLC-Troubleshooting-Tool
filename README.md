@@ -19,9 +19,14 @@ industrial-ai-diagnostics/
 ├── .env.example
 ├── requirements.txt
 ├── bridge.py
+├── modbus_smoke_test.py
 ├── dashboard.py
 ├── main.cpp
 ├── plc_logic.st
+├── project_execution_guide.md
+├── factoryio_tag_plan.md
+├── commissioning_checklist.md
+├── demo_runbook.md
 ├── register_map.md
 ├── prompts.md
 ├── esp32_wiring.md
@@ -125,6 +130,8 @@ This prototype is stronger when the diagnostics node is independent from the PLC
 
 ## Setup
 
+If you want the most complete step-by-step build order, start with [project_execution_guide.md](/Users/suraa/Desktop/1/project_execution_guide.md). The README is the overview; the execution guide is the actual runbook.
+
 ### 1. Python Environment
 
 ```bash
@@ -152,6 +159,14 @@ Edit `.env` and set:
 5. Start simple: verify one conveyor sensor bit changes in CODESYS before wiring every scenario.
 
 ### 3. Python Bridge
+
+Before starting the full bridge, prove Modbus connectivity first:
+
+```bash
+python modbus_smoke_test.py
+```
+
+Then start the bridge:
 
 ```bash
 python bridge.py
@@ -183,7 +198,8 @@ streamlit run dashboard.py
 
 1. Start CODESYS runtime / simulation and confirm Modbus TCP is serving the register block.
 2. Start Factory I/O and verify at least one sensor changes the PLC variable.
-3. Run `python bridge.py`.
+3. Run `python modbus_smoke_test.py`.
+4. Run `python bridge.py`.
 4. Run `streamlit run dashboard.py`.
 5. Power the ESP32 and confirm WebSocket connection.
 6. Trigger demo scenarios one by one.
@@ -233,6 +249,8 @@ streamlit run dashboard.py
 7. Ask a technician-style question in the dashboard chat.
 8. Clear the fault and show recovery.
 
+For the live talk track and operator steps, use [demo_runbook.md](/Users/suraa/Desktop/1/demo_runbook.md).
+
 ## Demo Scenarios
 
 See [demo_cases.md](/Users/suraa/Desktop/1/demo_cases.md) for the full set of six use cases:
@@ -243,6 +261,8 @@ See [demo_cases.md](/Users/suraa/Desktop/1/demo_cases.md) for the full set of si
 - Conveyor Jam Fault
 - Fault + Reset Recovery
 - HVAC / Pump Failure
+
+Use [factoryio_tag_plan.md](/Users/suraa/Desktop/1/factoryio_tag_plan.md) when you build the Factory I/O mapping, and use [commissioning_checklist.md](/Users/suraa/Desktop/1/commissioning_checklist.md) before the final demo.
 
 ## Manual Configuration Steps You Still Need
 
