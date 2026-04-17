@@ -147,6 +147,8 @@ Everything else is code or supporting reference.
 
 Follow this exact order:
 
+If you want the fastest path to see the software stack working before the real PLC/simulation are wired, skip ahead briefly to [local_demo_mode.md](/Users/suraa/Desktop/1/local_demo_mode.md), then come back to the real build.
+
 ### Phase 1. Install the tools
 
 Use:
@@ -260,6 +262,11 @@ What you want:
 - tags populated
 - machine state visible
 
+If you are using local simulated mode instead of a real PLC source:
+
+- set `DATA_SOURCE=mock`
+- use [local_demo_mode.md](/Users/suraa/Desktop/1/local_demo_mode.md)
+
 ### Phase 8. Start the computer UI
 
 Run:
@@ -356,6 +363,11 @@ How it gets data:
 In short:
 
 the dashboard is the computer-side operator / technician UI.
+
+It can run in two ways:
+
+- real mode: reading data that originated from CODESYS over Modbus
+- mock mode: using the backend’s built-in scenario simulator for rehearsal and UI testing
 
 ## 9. How The Whole System Works Fundamentally
 

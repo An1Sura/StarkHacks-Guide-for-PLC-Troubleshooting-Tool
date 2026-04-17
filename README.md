@@ -22,6 +22,7 @@ Secondary guides:
 - [START_HERE.md](/Users/suraa/Desktop/1/START_HERE.md)
 - [full_build_manual.md](/Users/suraa/Desktop/1/full_build_manual.md)
 - [how_it_works.md](/Users/suraa/Desktop/1/how_it_works.md)
+- [local_demo_mode.md](/Users/suraa/Desktop/1/local_demo_mode.md)
 
 ## File Tree
 
@@ -31,6 +32,7 @@ industrial-ai-diagnostics/
 ├── ULTIMATE_GUIDE.md
 ├── START_HERE.md
 ├── how_it_works.md
+├── local_demo_mode.md
 ├── .env.example
 ├── requirements.txt
 ├── bridge.py

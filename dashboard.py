@@ -114,6 +114,16 @@ def post_chat(base_url: str, question: str) -> dict[str, Any] | None:
         return None
 
 
+def post_json(base_url: str, route: str, payload: dict[str, Any]) -> dict[str, Any] | None:
+    try:
+        response = requests.post(f"{base_url}{route}", json=payload, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except Exception as exc:
+        st.error(f"Request failed for {route}: {exc}")
+        return None
+
+
 def severity_class(value: str | None) -> str:
     mapping = {
         "LOW": "sev-low",
@@ -258,6 +268,21 @@ def main() -> None:
     snapshot = get_json(base_url, "/api/state")
     if not snapshot:
         st.stop()
+
+    with st.sidebar:
+        st.divider()
+        st.subheader("Runtime")
+        st.write(f"Data source: `{snapshot['bridge'].get('data_source', 'unknown')}`")
+        if snapshot.get("mock", {}).get("enabled"):
+            st.caption("Mock mode is enabled. Use these buttons to rehearse demo scenarios without CODESYS/Factory I/O.")
+            for scenario in snapshot["mock"].get("available_scenarios", []):
+                label = scenario["label"]
+                scenario_name = scenario["name"]
+                suffix = " (active)" if scenario_name == snapshot["mock"].get("active_scenario") else ""
+                if st.button(f"{label}{suffix}", use_container_width=True):
+                    result = post_json(base_url, "/api/mock/scenario", {"scenario": scenario_name})
+                    if result:
+                        st.rerun()
 
     render_metric_strip(snapshot)
 

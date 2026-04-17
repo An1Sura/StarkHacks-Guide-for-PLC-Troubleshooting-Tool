@@ -77,11 +77,13 @@ FAULT_LABELS = {
 
 @dataclass
 class Settings:
+    data_source: str = os.getenv("DATA_SOURCE", "modbus").strip().lower()
     modbus_host: str = os.getenv("MODBUS_HOST", "127.0.0.1")
     modbus_port: int = int(os.getenv("MODBUS_PORT", "502"))
     modbus_unit_id: int = int(os.getenv("MODBUS_UNIT_ID", "1"))
     modbus_poll_interval_s: float = float(os.getenv("MODBUS_POLL_INTERVAL_S", "0.50"))
     modbus_timeout_s: float = float(os.getenv("MODBUS_TIMEOUT_S", "1.5"))
+    mock_scenario: str = os.getenv("MOCK_SCENARIO", "idle")
     fastapi_host: str = os.getenv("FASTAPI_HOST", "0.0.0.0")
     fastapi_port: int = int(os.getenv("FASTAPI_PORT", "8000"))
     ai_model: str = os.getenv("AI_MODEL", "gpt-4o-mini")
@@ -125,6 +127,10 @@ class DiagnosticReport:
 
 class ChatRequest(BaseModel):
     question: str
+
+
+class MockScenarioRequest(BaseModel):
+    scenario: str
 
 
 class WebSocketManager:
@@ -268,6 +274,201 @@ class RuleBasedDiagnostics:
         )
 
 
+class MockTagSource:
+    def __init__(self, default_scenario: str) -> None:
+        self._default_values = {
+            spec.name: spec.default for spec in REGISTER_MAP
+        }
+        self._default_values["Safety_OK"] = True
+        self._default_values["Mode_Label"] = "IDLE"
+        self._default_values["Fault_Label"] = "NO_FAULT"
+        self._scenario_started_at = time.monotonic()
+        self.active_scenario = "idle"
+        self.set_scenario(default_scenario)
+
+    def list_scenarios(self) -> list[dict[str, str]]:
+        return [
+            {"name": "idle", "label": "Idle / healthy"},
+            {"name": "normal_run", "label": "Normal conveyor run"},
+            {"name": "motor_start_blocked", "label": "Motor start blocked"},
+            {"name": "conveyor_jam", "label": "Conveyor jam fault"},
+            {"name": "fault_reset_demo", "label": "Fault + reset recovery"},
+            {"name": "sequence_timeout", "label": "Sequence timeout"},
+            {"name": "tank_fill_verify", "label": "Tank fill verification"},
+            {"name": "hvac_fault", "label": "HVAC / pump fault"},
+        ]
+
+    def set_scenario(self, scenario: str) -> None:
+        available = {item["name"] for item in self.list_scenarios()}
+        if scenario not in available:
+            raise ValueError(f"Unknown mock scenario: {scenario}")
+        self.active_scenario = scenario
+        self._scenario_started_at = time.monotonic()
+
+    def _base(self) -> dict[str, Any]:
+        values = dict(self._default_values)
+        values["Mode_Code"] = 0
+        values["Fault_Code"] = 0
+        return values
+
+    def get_tags(self) -> dict[str, Any]:
+        elapsed = time.monotonic() - self._scenario_started_at
+        tags = self._base()
+        scenario = self.active_scenario
+
+        if scenario == "idle":
+            pass
+        elif scenario == "normal_run":
+            tags.update(
+                {
+                    "Mode_Code": 1,
+                    "Safety_OK": True,
+                    "Start_Command": True,
+                    "Conveyor_Running": True,
+                    "Motor_Current": 18,
+                }
+            )
+        elif scenario == "motor_start_blocked":
+            tags.update(
+                {
+                    "Mode_Code": 1,
+                    "Start_Command": True,
+                    "Safety_OK": False,
+                    "Conveyor_Running": False,
+                    "Fault_Code": 101,
+                }
+            )
+        elif scenario == "conveyor_jam":
+            tags.update(
+                {
+                    "Mode_Code": 1,
+                    "Safety_OK": True,
+                    "Start_Command": True,
+                }
+            )
+            if elapsed < 2.0:
+                tags.update(
+                    {
+                        "Conveyor_Running": True,
+                        "Sensor_Blocked": False,
+                        "Motor_Current": 18,
+                    }
+                )
+            elif elapsed < 4.0:
+                tags.update(
+                    {
+                        "Conveyor_Running": True,
+                        "Sensor_Blocked": True,
+                        "Motor_Current": 46,
+                    }
+                )
+            else:
+                tags.update(
+                    {
+                        "Conveyor_Running": False,
+                        "Sensor_Blocked": True,
+                        "Motor_Current": 46,
+                        "System_Fault_Latch": True,
+                        "Fault_Code": 201,
+                    }
+                )
+        elif scenario == "fault_reset_demo":
+            tags.update(
+                {
+                    "Mode_Code": 1,
+                    "Fault_Code": 201,
+                }
+            )
+            if elapsed < 4.0:
+                tags.update(
+                    {
+                        "System_Fault_Latch": True,
+                        "Sensor_Blocked": True,
+                        "Motor_Current": 42,
+                    }
+                )
+            elif elapsed < 7.0:
+                tags.update(
+                    {
+                        "System_Fault_Latch": True,
+                        "Sensor_Blocked": False,
+                        "Motor_Current": 0,
+                    }
+                )
+            else:
+                tags.update(
+                    {
+                        "Reset_Command": True,
+                        "System_Fault_Latch": False,
+                        "Fault_Code": 0,
+                        "Sensor_Blocked": False,
+                        "Motor_Current": 0,
+                    }
+                )
+        elif scenario == "sequence_timeout":
+            tags.update(
+                {
+                    "Mode_Code": 2,
+                    "Start_Command": True,
+                    "Safety_OK": True,
+                }
+            )
+            if elapsed < 3.0:
+                tags.update(
+                    {
+                        "Conveyor_Running": True,
+                        "Sequence_Timeout": False,
+                        "Fault_Code": 0,
+                    }
+                )
+            else:
+                tags.update(
+                    {
+                        "Conveyor_Running": False,
+                        "Sequence_Timeout": True,
+                        "System_Fault_Latch": True,
+                        "Fault_Code": 301,
+                    }
+                )
+        elif scenario == "tank_fill_verify":
+            tags.update(
+                {
+                    "Mode_Code": 3,
+                    "Tank_Level_Low": True,
+                    "Tank_Level_High": False,
+                    "Pump_Running": False,
+                    "System_Fault_Latch": True,
+                    "Fault_Code": 401,
+                }
+            )
+        elif scenario == "hvac_fault":
+            tags.update(
+                {
+                    "Mode_Code": 4,
+                    "Start_Command": True,
+                    "Pump_Running": False,
+                    "HVAC_Fault": True,
+                    "System_Fault_Latch": True,
+                    "Fault_Code": 501,
+                }
+            )
+
+        tags["Mode_Label"] = MODE_LABELS.get(tags["Mode_Code"], "UNKNOWN")
+        tags["Fault_Label"] = FAULT_LABELS.get(tags["Fault_Code"], "UNMAPPED")
+        return tags
+
+    def get_registers(self) -> list[int]:
+        tags = self.get_tags()
+        registers: list[int] = []
+        for spec in REGISTER_MAP:
+            value = tags[spec.name]
+            if spec.data_type == "bool":
+                registers.append(1 if bool(value) else 0)
+            else:
+                registers.append(int(value))
+        return registers
+
+
 class OpenAIDiagnosticsClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
@@ -385,6 +586,7 @@ class BridgeRuntime:
         self.ai_client = OpenAIDiagnosticsClient(settings)
         self.rule_diagnostics = RuleBasedDiagnostics()
         self.modbus_client: Optional[AsyncModbusTcpClient] = None
+        self.mock_source: Optional[MockTagSource] = None
         self.events: deque[dict[str, Any]] = deque(maxlen=settings.event_log_size)
         self.ai_history: deque[dict[str, Any]] = deque(maxlen=settings.ai_history_size)
         self.chat_history: deque[dict[str, Any]] = deque(maxlen=40)
@@ -398,7 +600,7 @@ class BridgeRuntime:
         self.poller_task: Optional[asyncio.Task] = None
         self.last_snapshot_broadcast_at: float = 0.0
         self.connection_status = {
-            "modbus": "DISCONNECTED",
+            "modbus": "SIMULATED" if settings.data_source == "mock" else "DISCONNECTED",
             "ai": "READY" if settings.ai_enabled else "RULE_FALLBACK",
         }
         self.last_poll_timestamp: Optional[str] = None
@@ -406,9 +608,11 @@ class BridgeRuntime:
         self._last_issue_key: Optional[str] = None
 
     async def startup(self) -> None:
+        if self.settings.data_source == "mock":
+            self.mock_source = MockTagSource(self.settings.mock_scenario)
         self.add_event(
             category="system",
-            message="Bridge runtime started.",
+            message=f"Bridge runtime started using {self.settings.data_source} data source.",
             severity="INFO",
         )
         self.poller_task = asyncio.create_task(self.polling_loop(), name="modbus-poller")
@@ -440,6 +644,10 @@ class BridgeRuntime:
             await asyncio.sleep(self.settings.modbus_poll_interval_s)
 
     async def ensure_modbus_connection(self) -> bool:
+        if self.settings.data_source == "mock":
+            self.connection_status["modbus"] = "SIMULATED"
+            return True
+
         if self.modbus_client and getattr(self.modbus_client, "connected", False):
             return True
 
@@ -465,23 +673,27 @@ class BridgeRuntime:
         if not await self.ensure_modbus_connection():
             return
 
-        assert self.modbus_client is not None
-        response = await self.modbus_client.read_holding_registers(
-            address=0,
-            count=len(REGISTER_MAP),
-            slave=self.settings.modbus_unit_id,
-        )
-        if response.isError():
-            self.connection_status["modbus"] = "ERROR"
-            self.add_event(
-                category="modbus",
-                message=f"Modbus read error: {response}",
-                severity="WARN",
+        if self.settings.data_source == "mock":
+            assert self.mock_source is not None
+            registers = self.mock_source.get_registers()
+        else:
+            assert self.modbus_client is not None
+            response = await self.modbus_client.read_holding_registers(
+                address=0,
+                count=len(REGISTER_MAP),
+                slave=self.settings.modbus_unit_id,
             )
-            self.modbus_client.close()
-            return
+            if response.isError():
+                self.connection_status["modbus"] = "ERROR"
+                self.add_event(
+                    category="modbus",
+                    message=f"Modbus read error: {response}",
+                    severity="WARN",
+                )
+                self.modbus_client.close()
+                return
+            registers = response.registers
 
-        registers = response.registers
         decoded = self.decode_registers(registers)
         transitions = self.detect_transitions(decoded, self.current_tags)
         self.current_tags = decoded
@@ -706,11 +918,16 @@ class BridgeRuntime:
             "bridge": {
                 "service": "industrial-ai-diagnostics-bridge",
                 "version": "0.1.0-hackathon",
+                "data_source": self.settings.data_source,
             },
             "connections": {
                 **self.connection_status,
                 "websocket_clients": self.ws_manager.connection_count,
-                "modbus_target": f"{self.settings.modbus_host}:{self.settings.modbus_port}",
+                "modbus_target": (
+                    "mock-scenarios"
+                    if self.settings.data_source == "mock"
+                    else f"{self.settings.modbus_host}:{self.settings.modbus_port}"
+                ),
             },
             "machine": {
                 "state_label": self.machine_state,
@@ -726,6 +943,11 @@ class BridgeRuntime:
             "ai_history": list(self.ai_history)[:10],
             "chat_history": list(self.chat_history)[:12],
             "register_map": [asdict(spec) for spec in REGISTER_MAP],
+            "mock": {
+                "enabled": self.settings.data_source == "mock",
+                "active_scenario": self.mock_source.active_scenario if self.mock_source else None,
+                "available_scenarios": self.mock_source.list_scenarios() if self.mock_source else [],
+            },
         }
 
     async def answer_question(self, question: str) -> dict[str, Any]:
@@ -840,6 +1062,38 @@ async def get_diagnostics() -> dict[str, Any]:
     return {
         "active_issue": runtime.current_issue.to_dict() if runtime.current_issue else None,
         "ai_history": list(runtime.ai_history)[:10],
+    }
+
+
+@app.get("/api/mock/scenarios")
+async def get_mock_scenarios() -> dict[str, Any]:
+    if settings.data_source != "mock" or not runtime.mock_source:
+        return {"enabled": False, "active_scenario": None, "scenarios": []}
+    return {
+        "enabled": True,
+        "active_scenario": runtime.mock_source.active_scenario,
+        "scenarios": runtime.mock_source.list_scenarios(),
+    }
+
+
+@app.post("/api/mock/scenario")
+async def set_mock_scenario(request: MockScenarioRequest) -> dict[str, Any]:
+    if settings.data_source != "mock" or not runtime.mock_source:
+        raise HTTPException(status_code=400, detail="Mock mode is not enabled.")
+    try:
+        runtime.mock_source.set_scenario(request.scenario.strip())
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    runtime.add_event(
+        category="mock",
+        message=f"Mock scenario changed to {runtime.mock_source.active_scenario}.",
+        severity="INFO",
+    )
+    await runtime.maybe_broadcast_snapshot(force=True)
+    return {
+        "enabled": True,
+        "active_scenario": runtime.mock_source.active_scenario,
+        "snapshot": runtime.snapshot(),
     }
 
 
